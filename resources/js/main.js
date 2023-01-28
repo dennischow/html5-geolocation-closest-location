@@ -87,6 +87,14 @@
         },
     };
 
+    function setUiAccessibility (arg) {
+        var btns = [eleStoreLocationSelection, eleCallBtn, eleAddressBtn];
+        btns.forEach(function (btn) {
+            btn.disabled = !arg;
+        });
+        console.log("setUiAccessibility: ", arg);
+    }
+
     function getCurrentLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(successHandler, errorHandler);
@@ -170,6 +178,8 @@
         });
         console.log("selectOption: ", id);
 
+        setUiAccessibility(true);
+
         // Trigger an event on targeted element
         // var event = new Event("change");
         // eleStoreLocationSelection.dispatchEvent(event);
@@ -201,6 +211,7 @@
         generateStoreOptions();
         selectionEventHandler();
         actionBtnsEventHandler();
+        setUiAccessibility(false);
 
         if (utils.getCookie("savedLocationId")) {
             console.log("Returnd User");
@@ -214,7 +225,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         setTimeout(function () {
             initialize();
-        }, 1000);
+        }, 800);
     }, false);
 
 })();
