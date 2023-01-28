@@ -199,8 +199,7 @@
         script.setAttribute("src", "https://unpkg.com/geolib@3.3.3/lib/index.js");
         script.setAttribute("async", "");
         script.onload = function () {
-            console.log("New User");
-            console.log("script has loaded");
+            console.log("scriptInjection completed & loaded");
             console.log("geolib: ", geolib);
             getCurrentLocation();
         };
@@ -220,6 +219,7 @@
         }
 
         scriptInjection();
+        console.log("New User");
     }
 
     document.addEventListener("DOMContentLoaded", function () {
