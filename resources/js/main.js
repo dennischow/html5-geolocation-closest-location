@@ -2,7 +2,7 @@
     var storesData = [
         {
             id: "c4ca4238a0b923820dcc509a6f75849b",
-            name: "VIP Billiards on College",
+            name: "[Toronto] VIP Billiards on College",
             telephone: "4161234567",
             // googleMapUrl: "https://goo.gl/maps/rva2rSACQR8347pE9",
             googleMapUrl: "https://www.bbc.com/",
@@ -14,7 +14,7 @@
         },
         {
             id: "c81e728d9d4c2f636f067f89cc14862c",
-            name: "VIP Billiards and Lounge",
+            name: "[Nort York] VIP Billiards and Lounge",
             telephone: "4169283820",
             address: "3030 Don Mills Rd E, North York, ON M2J 3C1",
             // googleMapUrl: "https://goo.gl/maps/5zLEN8NBy6QbxujU9",
@@ -26,7 +26,7 @@
         },
         {
             id: "eccbc87e4b5ce2fe28308fd9f2a7baf3",
-            name: "Long & McQuade Musical Instruments",
+            name: "[Toronto] Long & McQuade Musical Instruments",
             telephone: "4169280394",
             address: "925 Bloor St W, Toronto, ON M6H 1L5, Canada",
             // googleMapUrl: "https://goo.gl/maps/QW4bPQYWp4RUpCpY9",
@@ -92,7 +92,7 @@
             navigator.geolocation.getCurrentPosition(successHandler, errorHandler);
             console.log("getCurrentLocation in progress...");
         } else {
-            selectOption(storesData[1].id);
+            selectOption(storesData[0].id);
             console.log("Your browser does not support geolocation API");
         }
     }
@@ -112,7 +112,7 @@
     }
 
     function errorHandler() {
-        selectOption(storesData[1].id);
+        selectOption(storesData[0].id);
         console.log("getCurrentLocation failed or no location allowed.");
     }
 
@@ -145,12 +145,12 @@
         eleStoreLocationDisplayText.innerText = result.name + " - " + result.address;
         eleCallBtn.setAttribute("data-url", "tel:" + result.telephone);
         eleAddressBtn.setAttribute("data-url", result.googleMapUrl);
-        utils.setCookie("hasLocationSelected", result.id, {
+        utils.setCookie("savedLocationId", result.id, {
             secure: true,
             "max-age": 3600*24*365.2425,
         });
         console.log("Object: ", result);
-        console.log("hasLocationSelected:", result.id);
+        console.log("savedLocationId:", result.id);
     }
 
     function selectionEventHandler() {
@@ -199,8 +199,8 @@
         selectionEventHandler();
         actionBtnsEventHandler();
 
-        if (utils.getCookie("hasLocationSelected")) {
-            selectOption(utils.getCookie("hasLocationSelected"));
+        if (utils.getCookie("savedLocationId")) {
+            selectOption(utils.getCookie("savedLocationId"));
             return;
         }
 
