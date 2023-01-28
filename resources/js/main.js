@@ -44,6 +44,49 @@
     var eleCallBtn = document.querySelector("#call-btn");
     var eleAddressBtn = document.querySelector("#address-btn");
 
+    // Methods are in below
+    var utils = {
+        getCookie: function (name) {
+            let matches = document.cookie.match(
+                new RegExp(
+                    "(?:^|; )" +
+                        name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
+                        "=([^;]*)"
+                )
+            );
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        },
+        setCookie: function (name, value, options = {}) {
+            options = {
+                path: "/",
+                // add other defaults here if necessary
+                ...options,
+            };
+
+            if (options.expires instanceof Date) {
+                options.expires = options.expires.toUTCString();
+            }
+
+            let updatedCookie =
+                encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+            for (let optionKey in options) {
+                updatedCookie += "; " + optionKey;
+                let optionValue = options[optionKey];
+                if (optionValue !== true) {
+                    updatedCookie += "=" + optionValue;
+                }
+            }
+
+            document.cookie = updatedCookie;
+        },
+        deleteCookie: function (name) {
+            setCookie(name, "", {
+                "max-age": -1,
+            });
+        },
+    };
+
     function getCurrentLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(successHandler, errorHandler);
@@ -102,7 +145,12 @@
         eleStoreLocationDisplayText.innerText = result.name + " - " + result.address;
         eleCallBtn.setAttribute("data-url", "tel:" + result.telephone);
         eleAddressBtn.setAttribute("data-url", result.googleMapUrl);
+        utils.setCookie("hasLocationSelected", result.id, {
+            secure: true,
+            "max-age": 3600*24*365.2425,
+        });
         console.log("Object: ", result);
+        console.log("hasLocationSelected:", result.id);
     }
 
     function selectionEventHandler() {
@@ -125,7 +173,7 @@
         eleStoreLocationSelection.dispatchEvent(event);
     }
 
-    function actionBtnsEventHandler () {
+    function actionBtnsEventHandler() {
         var btns = [eleCallBtn, eleAddressBtn];
         btns.forEach(function (btn) {
             btn.addEventListener("click", function (event) {
@@ -134,16 +182,35 @@
         });
     }
 
-    var script = document.createElement("script");
-    script.setAttribute("src", "https://unpkg.com/geolib@3.3.3/lib/index.js");
-    script.setAttribute("async", "");
-    script.onload = function () {
-        console.log("script has loaded");
-        console.log("geolib: ", geolib);
+    function scriptInjection() {
+        var script = document.createElement("script");
+        script.setAttribute("src", "https://unpkg.com/geolib@3.3.3/lib/index.js");
+        script.setAttribute("async", "");
+        script.onload = function () {
+            console.log("script has loaded");
+            console.log("geolib: ", geolib);
+            getCurrentLocation();
+        };
+        document.head.appendChild(script);
+    }
+
+    function initialize() {
         generateStoreOptions();
         selectionEventHandler();
         actionBtnsEventHandler();
-        getCurrentLocation();
-    };
-    document.head.appendChild(script);
+
+        if (utils.getCookie("hasLocationSelected")) {
+            selectOption(utils.getCookie("hasLocationSelected"));
+            return;
+        }
+
+        scriptInjection();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            initialize();
+        }, 1000);
+    }, false);
+
 })();
